@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Nonogram Solver</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Nonogram Solver</h1>
+        <div class="controls">
+            <div class="input-group">
+                <label for="size-select">Puzzle Size:</label>
+                <select id="size-select">
+                    <option value="5">5 x 5</option>
+                    <option value="10" selected>10 x 10</option>
+                    <option value="15">15 x 15</option>
+                    <option value="20">20 x 20</option>
+                    <option value="25">25 x 25</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="speed-slider">Speed:</label>
+                <input type="range" id="speed-slider" min="0" max="100" value="80">
+                <span id="speed-value">80</span>
+            </div>
+            <div class="button-group">
+                <button id="btn-generate">Generate New Puzzle</button>
+                <button id="btn-custom">Custom Puzzle</button>
+                <button id="btn-clear">Clear Board</button>
+                <button id="btn-solve" class="primary">Solve Animation</button>
+                <button id="btn-pause" disabled>Pause</button>
+            </div>
+        </div>
+        <div id="status">Ready</div>
+        <div id="timer">00:00</div>
+        <div class="board-container">
+            <table id="nonogram-table"></table>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
