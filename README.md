@@ -4,17 +4,19 @@ A web-based Nonogram (Picross) puzzle generator and automated solver. This proje
 
 ## Features
 
-- **Puzzle Generation:** Generate random Nonogram puzzles of varying sizes.
-- **Manual Play:** Play the generated puzzles manually. Left-click to fill, right-click to mark as empty, and track your time!
+- **Puzzle Generation:** Generate random Nonogram puzzles of varying sizes (guaranteed to avoid completely empty '0' clue rows or columns).
+- **Manual Play:** Play the generated puzzles manually. Left-click to fill, right-click to mark as empty, and click-and-drag across cells to draw continuously. Track your time!
 - **Automated Solver:** Watch the algorithm solve the puzzle step-by-step. The solver uses logical deduction (finding overlaps among all valid line permutations) and backtracking for complex configurations.
-- **Custom Puzzles:** Input your own row and column clues to solve custom Nonograms.
+- **Custom Puzzles:** Set up an empty grid and input your own row and column clues by directly editing them on the grid.
 - **Visualization Controls:** Adjust the solving speed or pause/resume the solver at any time.
+- **Persistent Settings:** Your preferred puzzle size and solving speed are automatically saved using Local Storage.
 
 ## Project Structure
 
+- `style.css`: Contains the UI styling, grid layout (including thick borders for 5x5 block groupings), empty cell cross markers, and CSS animations.
 - `main.js`: Handles UI interactions, timer, grid rendering, and DOM manipulation. Contains an integrated `NonogramSolver` implementation and `PuzzleGenerator`.
 - `generator.js`: Contains the standalone logic for generating valid random Nonogram grids and deriving their clues.
-- `solver.js`: Contains a standalone, modular `NonogramSolver` class implementation.
+- `solver.js`: Contains a standalone, modular `NonogramSolver` class implementation representing the core logical line-solving engine.
 
 ## How to Run
 
