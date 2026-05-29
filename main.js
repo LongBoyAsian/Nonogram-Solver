@@ -43,12 +43,16 @@ class PuzzleGenerator {
 }
 
 class NonogramSolver {
-    constructor(size, rowClues, colClues, updateCallback) {
+    constructor(size, rowClues, colClues, updateCallback, initialGrid = null) {
         this.size = size;
         this.rowClues = rowClues;
         this.colClues = colClues;
         // 0 = unknown, 1 = filled, -1 = empty/discarded
-        this.grid = Array(size).fill(null).map(() => Array(size).fill(0));
+        if (initialGrid) {
+            this.grid = initialGrid.map(row => [...row]);
+        } else {
+            this.grid = Array(size).fill(null).map(() => Array(size).fill(0));
+        }
         this.updateCallback = updateCallback; 
         this.delay = 30; // ms between thought process steps
         this.isRunning = false;
@@ -146,6 +150,22 @@ class NonogramSolver {
     }
 
     async solveLine(line, clues, type, index) {
+        // Optimization: Skip fully solved lines immediately without highlighting or sleeping
+        if (!line.includes(0)) {
+            // Fast validation for completely filled lines to catch manual mistakes
+            let actualClues = [];
+            let count = 0;
+            for (let val of line) {
+                if (val === 1) count++;
+                else if (count > 0) { actualClues.push(count); count = 0; }
+            }
+            if (count > 0) actualClues.push(count);
+            if (actualClues.length === 0) actualClues = [0];
+            
+            const isValid = actualClues.length === clues.length && actualClues.every((c, i) => c === clues[i]);
+            return isValid ? 0 : -1; 
+        }
+
         // Highlight the current line being tested visually
         await this.updateCallback(this.grid, { type, index, state: 'testing' });
         await this.sleep();
@@ -171,6 +191,11 @@ class NonogramSolver {
         }
 
         if (lineChanged) {
+            // Sync column changes to the main grid BEFORE the visual callback fires
+            if (type === 'col') {
+                for (let r = 0; r < this.size; r++) this.grid[r][index] = line[r];
+            }
+
             await this.updateCallback(this.grid, { type, index, state: 'changed' });
             await this.sleep();
         }
@@ -236,6 +261,7 @@ class NonogramSolver {
 let currentSize = parseInt(localStorage.getItem('nonogram-size')) || 10;
 let puzzleData = null;
 let solverInstance = null;
+let currentGrid = null; // Explicitly declared
 
 let table, sizeSelect, btnGenerate, btnCustom, btnClear, btnSolve, btnPause, statusDiv, speedSlider, speedValue, timerDiv;
 let timerInterval = null;
@@ -537,6 +563,9 @@ function fillEmptyWithCrosses() {
 }
 
 async function updateUI(gridState, highlightInfo) {
+    // Sync global state so manual edits and pausing/resuming don't lose progress
+    currentGrid = gridState;
+
     // Clear previous highlights
     document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('highlight'));
     
@@ -600,8 +629,8 @@ async function startSolver() {
         const fullySolved = await solverInstance.solve();
         
         currentGrid = solverInstance.grid.map(row => [...row]); // Sync grid so you can continue playing if it halts
+        updateUI(currentGrid); // Force a final render to catch the very last state
 
-        document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('highlight'));
         statusDiv.innerText = fullySolved ? "Puzzle Solved Successfully!" : "Algorithm Halted.";
         btnPause.disabled = true;
     } catch (err) {

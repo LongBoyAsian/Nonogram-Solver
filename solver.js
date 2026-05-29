@@ -1,10 +1,14 @@
 export class NonogramSolver {
-    constructor(size, rowClues, colClues, updateCallback) {
+    constructor(size, rowClues, colClues, updateCallback, initialGrid = null) {
         this.size = size;
         this.rowClues = rowClues;
         this.colClues = colClues;
         // 0 = unknown, 1 = filled, -1 = empty/discarded
-        this.grid = Array(size).fill(null).map(() => Array(size).fill(0));
+        if (initialGrid) {
+            this.grid = initialGrid.map(row => [...row]);
+        } else {
+            this.grid = Array(size).fill(null).map(() => Array(size).fill(0));
+        }
         this.updateCallback = updateCallback; 
         this.delay = 30; // ms between thought process steps
         this.isRunning = false;
@@ -45,6 +49,9 @@ export class NonogramSolver {
     }
 
     async solveLine(line, clues, type, index) {
+        // Optimization: Skip fully solved lines immediately without highlighting or sleeping
+        if (!line.includes(0)) return false;
+
         // Highlight the current line being tested visually
         await this.updateCallback(this.grid, { type, index, state: 'testing' });
         await this.sleep();
@@ -70,6 +77,11 @@ export class NonogramSolver {
         }
 
         if (lineChanged) {
+            // Sync column changes to the main grid BEFORE the visual callback fires
+            if (type === 'col') {
+                for (let r = 0; r < this.size; r++) this.grid[r][index] = line[r];
+            }
+
             await this.updateCallback(this.grid, { type, index, state: 'changed' });
             await this.sleep();
         }
