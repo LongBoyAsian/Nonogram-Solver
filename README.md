@@ -35,3 +35,7 @@ Simply open the HTML file (e.g., `index.html`) in any modern web browser to star
 - **Speed Slider:** Adjust the speed of the visualization dynamically.
 - **Pause/Resume:** Pause the solver's execution at any time to inspect the board.
 - **Clear:** Resets the board to an empty state for the current puzzle.
+
+## Future Plans
+
+- **Picture to Nonogram Converter:** Add the ability for users to draw or upload their own picture, which the program will then automatically convert into a playable Nonogram puzzle and generate the corresponding clues.
